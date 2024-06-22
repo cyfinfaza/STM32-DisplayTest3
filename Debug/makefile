@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (11.3.rel1)
+# Toolchain: GNU Tools for STM32 (12.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -136,6 +136,11 @@ RM := rm -rf
 -include Drivers/lvgl/demos/keypad_encoder/subdir.mk
 -include Drivers/lvgl/demos/benchmark/assets/subdir.mk
 -include Drivers/lvgl/demos/benchmark/subdir.mk
+-include Drivers/UI/screens/subdir.mk
+-include Drivers/UI/images/subdir.mk
+-include Drivers/UI/fonts/subdir.mk
+-include Drivers/UI/components/subdir.mk
+-include Drivers/UI/subdir.mk
 -include Drivers/STM32F7xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -187,8 +192,8 @@ all: main-build
 main-build: DisplayTest3.elf secondary-outputs
 
 # Tool invocations
-DisplayTest3.elf DisplayTest3.map: $(OBJS) $(USER_OBJS) C:\Users\cyfin\Documents\code\STM32-DisplayTest3\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "DisplayTest3.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\cyfin\Documents\code\STM32-DisplayTest3\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DisplayTest3.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+DisplayTest3.elf DisplayTest3.map: $(OBJS) $(USER_OBJS) C:\Users\cyfin\Documents\stm32\DisplayTest3\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "DisplayTest3.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\cyfin\Documents\stm32\DisplayTest3\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DisplayTest3.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

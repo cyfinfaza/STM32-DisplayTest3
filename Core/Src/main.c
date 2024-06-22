@@ -23,7 +23,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "lvgl.h"
-#include "demos/stress/lv_demo_stress.h"
+//#include "demos/stress/lv_demo_stress.h"
+#include "ui.h"
 
 /* USER CODE END Includes */
 
@@ -43,6 +44,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 CAN_HandleTypeDef hcan1;
 
 DMA2D_HandleTypeDef hdma2d;
@@ -55,6 +58,9 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
+uint32_t adc_data;
+int temp;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +71,7 @@ static void MX_CAN1_Init(void);
 static void MX_LTDC_Init(void);
 static void MX_DMA2D_Init(void);
 static void MX_TIM12_Init(void);
+static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -80,9 +87,15 @@ static void MX_TIM12_Init(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+
+  /* Enable the CPU Cache */
+
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -107,11 +120,22 @@ int main(void)
   MX_LTDC_Init();
   MX_DMA2D_Init();
   MX_TIM12_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
+  // prepare temp sensor - define variable to be updated in main, start and calibrate adc with vrefint
+//  HAL_ADC_Start(&hadc1);
+//  HAL_ADCEx_Calibration_Start(&hadc1);
+
+  // setup lvgl
   lv_init();
   lv_port_disp_init(&hltdc);
-  lv_demo_benchmark();
+//  lv_demo_benchmark();
+  ui_init();
+  // show screen 2
+  _ui_screen_change(&ui_Screen_Dark, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, ui_Screen_Dark_screen_init);
+  _ui_screen_change(&ui_Screen_Loading, LV_SCR_LOAD_ANIM_FADE_ON, 500, 1000, ui_Screen_Loading_screen_init);
+  _ui_screen_change(&ui_Screen_Main, LV_SCR_LOAD_ANIM_FADE_ON, 100, 5000, ui_Screen_Main_screen_init);
 
   /* USER CODE END 2 */
 
@@ -122,6 +146,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	// get temp sensor data
+//	  HAL_ADC_PollForConversion(&hadc1, 100);
+//	  adc_data = HAL_ADC_GetValue(&hadc1);
+//	  temp = ((adc_data - 760) * 100) / 16;
+
 	lv_task_handler();  // to be added
 	HAL_Delay(5);  // to be added
   }
@@ -136,10 +165,6 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  /** Configure LSE Drive Capability
-  */
-  HAL_PWR_EnableBkUpAccess();
 
   /** Configure the main internal regulator output voltage
   */
@@ -184,6 +209,58 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**

@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (11.3.rel1)
+# Toolchain: GNU Tools for STM32 (12.3.rel1)
 ################################################################################
 
 ELF_SRCS := 
@@ -25,6 +25,11 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 Drivers/STM32F7xx_HAL_Driver/Src \
+Drivers/UI/components \
+Drivers/UI/fonts \
+Drivers/UI/images \
+Drivers/UI/screens \
+Drivers/UI \
 Drivers/lvgl/demos/benchmark/assets \
 Drivers/lvgl/demos/benchmark \
 Drivers/lvgl/demos/keypad_encoder \

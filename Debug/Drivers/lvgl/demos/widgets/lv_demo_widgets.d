@@ -227,12 +227,7 @@ Drivers/lvgl/demos/widgets/lv_demo_widgets.o: \
  ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/imgbtn/lv_imgbtn.h \
  ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/imgbtn/../../../lvgl.h \
  ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/span/lv_span.h \
- ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/span/../../../lvgl.h \
- ../Drivers/lvgl/demos/widgets/../widgets/lv_demo_widgets.h \
- ../Drivers/lvgl/demos/widgets/../benchmark/lv_demo_benchmark.h \
- ../Drivers/lvgl/demos/widgets/../benchmark/../lv_demos.h \
- ../Drivers/lvgl/demos/widgets/../stress/lv_demo_stress.h \
- ../Drivers/lvgl/demos/widgets/../stress/../lv_demos.h
+ ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/span/../../../lvgl.h
 ../Drivers/lvgl/demos/widgets/lv_demo_widgets.h:
 ../Drivers/lvgl/demos/widgets/../lv_demos.h:
 ../Drivers/lvgl/demos/widgets/../../lvgl.h:
@@ -461,8 +456,3 @@ Drivers/lvgl/demos/widgets/lv_demo_widgets.o: \
 ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/imgbtn/../../../lvgl.h:
 ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/span/lv_span.h:
 ../Drivers/lvgl/demos/widgets/../../src/extra/widgets/span/../../../lvgl.h:
-../Drivers/lvgl/demos/widgets/../widgets/lv_demo_widgets.h:
-../Drivers/lvgl/demos/widgets/../benchmark/lv_demo_benchmark.h:
-../Drivers/lvgl/demos/widgets/../benchmark/../lv_demos.h:
-../Drivers/lvgl/demos/widgets/../stress/lv_demo_stress.h:
-../Drivers/lvgl/demos/widgets/../stress/../lv_demos.h:

@@ -21,6 +21,8 @@
 
 #define DOUBLE_BUFFERED 0
 
+#define LV_BUF_SIZE MY_DISP_HOR_RES * 68
+
 
 /**********************
  *      TYPEDEFS
@@ -42,6 +44,11 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 static lv_disp_drv_t disp_drv;                         /*Descriptor of a display driver*/
 
 static LTDC_HandleTypeDef * hltdc;
+
+
+static lv_color_t buf_disp[MY_DISP_HOR_RES * MY_DISP_VER_RES];                          /*A buffer for 10 rows*/
+static lv_color_t buf_lv1[LV_BUF_SIZE];
+static lv_color_t buf_lv2[LV_BUF_SIZE];
 
 /**********************
  *      MACROS
@@ -93,11 +100,10 @@ void lv_port_disp_init(LTDC_HandleTypeDef * provided_hltcd)
 
 #if !DOUBLE_BUFFERED
     static lv_disp_draw_buf_t draw_buf_dsc;
-    static lv_color_t buf_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];                          /*A buffer for 10 rows*/
-    lv_disp_draw_buf_init(&draw_buf_dsc, buf_1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES);   /*Initialize the display buffer*/
+    lv_disp_draw_buf_init(&draw_buf_dsc, buf_lv1, buf_lv2, LV_BUF_SIZE);   /*Initialize the display buffer*/
 
 //    memset(buf_1, 0xe0, MY_DISP_HOR_RES * MY_DISP_VER_RES * sizeof(lv_color_t));
-    HAL_LTDC_SetAddress(hltdc, (uint32_t)buf_1, 0);
+    HAL_LTDC_SetAddress(hltdc, (uint32_t)buf_disp, 0);
 
 #else
     /* Example for 2) */
@@ -131,7 +137,8 @@ void lv_port_disp_init(LTDC_HandleTypeDef * provided_hltcd)
 #if DOUBLE_BUFFERED
     disp_drv.full_refresh = 1;
 #else
-    disp_drv.direct_mode = 1;
+//    disp_drv.full_refresh = 1;
+//    disp_drv.direct_mode = 1;
 #endif
 
     /* Fill a memory array with a color if you have GPU.
@@ -178,5 +185,36 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 #if DOUBLE_BUFFERED
 	HAL_LTDC_SetAddress(hltdc, color_p, 0);
 #endif
-    lv_disp_flush_ready(disp_drv);
+	int pix_size = sizeof(lv_color_t);
+	int width = (area->x2 - area->x1 + 1);
+	int height = (area->y2 - area->y1 + 1);
+	// memcopy the provided buffer to buf_disp in the correct location
+//	for (int y = 0; y < height; y++) {
+//		memcpy(buf_disp+(area->x1*pix_size)+(area->y1+y)*MY_DISP_HOR_RES, color_p+y*MY_DISP_HOR_RES, width*pix_size);
+//	}
+	// perform the copy using DMA2D
+	// define dma2d
+	DMA2D_HandleTypeDef hdma2d;
+	hdma2d.Instance = DMA2D;
+	hdma2d.Init.Mode = DMA2D_M2M;
+	hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+	hdma2d.Init.OutputOffset = MY_DISP_HOR_RES - width;
+	hdma2d.LayerCfg[1].InputOffset = 0;
+	hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
+	hdma2d.LayerCfg[1].InputAlpha = 0;
+	hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+
+	// init
+	HAL_DMA2D_Init(&hdma2d);
+	HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+
+	// start
+	HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)color_p, (uint32_t)buf_disp+area->x1*pix_size+area->y1*MY_DISP_HOR_RES*pix_size, width, height);
+//	HAL_DMA2D_PollForTransfer(&hdma2d, 10);
+
+//    lv_disp_flush_ready(disp_drv);
+}
+
+void dma2d_done(DMA2D_HandleTypeDef *hdma2d) {
+	lv_disp_flush_ready(&disp_drv);
 }
